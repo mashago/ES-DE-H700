@@ -1,73 +1,77 @@
-# ES-DE for Anbernic H700(原厂 DeepPlayOS)
+# ES-DE for Anbernic H700 (Stock DeepPlayOS)
 
-在 **Anbernic H700 系列掌机**(RG34XXSP / RG35XX Plus / RG35XX H / RG35XX SP / RG35XX 2024 / RG40XX H / RG40XX V / RG28XX / RG CUBEXX / RG34XX)**保留原厂系统**的情况下,以 **dmenu APPS 应用形态**运行 ES-DE 3.4.1(OpenGL ES 渲染,硬件加速)。
+Run **ES-DE 3.4.1** (OpenGL ES renderer, hardware accelerated) on **Anbernic H700 handhelds** (RG34XXSP / RG35XX Plus / RG35XX H / RG35XX SP / RG35XX 2024 / RG40XX H / RG40XX V / RG28XX / RG CUBEXX / RG34XX) **while keeping the stock system** — delivered as a dmenu APPS application.
 
-不刷机、不换系统、不动启动链 —— 从 dmenu 进入 ES-DE,退出即回原启动器,零风险。
+No reflash, no system replacement, no boot-chain changes. Launch ES-DE from dmenu, exit back to the stock launcher. Zero risk.
 
-## 特性
+[中文版](README_zh.md) | Build recipe: [BUILD.md](BUILD.md) (中文: [BUILD_zh.md](BUILD_zh.md))
 
-- ES-DE 3.4.1 自编译 **OpenGL ES 版**(Mali-G31 硬件渲染,GLES 3.2,720x480 满帧)
-- 游戏启动走**厂商原路**(`RA_launch.sh`):边框、着色器、按机种配置、自动读档/存盘全部与官方启动器一致
-- 内置手柄精确映射(A/B/X/Y/L1/L2/R1/R2/方向/SELECT/START;ROM 目录自动扫描 `/mnt/mmc/Roms`)
-- 主题、刮削、收藏等 ES-DE 完整功能
+> **Binary source**: the `es-de` binary in this repo is compiled from the official **ES-DE v3.4.1** source (https://gitlab.com/es-de/emulationstation-de) with the OpenGL ES renderer for the H700's Mali-G31 GPU (GLES 3.2). See [BUILD.md](BUILD.md) for the exact build procedure.
 
-## 安装
+## Features
 
-把本仓库拷贝到掌机任意目录(建议 `/mnt/mmc/` 下),SSH 进去:
+- ES-DE 3.4.1 self-built **OpenGL ES edition** (Mali-G31 hardware rendering, GLES 3.2, full speed at 720x480)
+- Games launch via the **vendor's own path** (`RA_launch.sh`): bezels, shaders, per-system RetroArch configs, savestate auto-load/save — identical behavior to the stock launcher
+- Precise built-in gamepad mapping (D-pad/A/B/X/Y/L1/L2/R1/R2/SELECT/START; ROMs auto-scanned from `/mnt/mmc/Roms`)
+- Full ES-DE features: themes, scraping, collections, favorites
+
+## Installation
+
+Copy this repo to any directory on the handheld (suggested: under `/mnt/mmc/`), then over SSH:
 
 ```bash
 cd ES-DE-H700
 sh install.sh
 ```
 
-安装完成后,dmenu 的 **APPS** 分类里出现「ES-DE」,直接启动。
+After installation, "ES-DE" appears in the **APPS** category of dmenu. Just launch it.
 
-### 卸载
+### Uninstall
 
 ```bash
 rm -rf /mnt/mmc/Roms/APPS/esde /mnt/mmc/Roms/APPS/ES-DE.sh
 rm -rf /mnt/data/es-de-home /mnt/data/mali-lib /mnt/data/retroarch-wrapper.sh
 ```
 
-## 使用提示
+## Usage notes
 
-| 事项 | 说明 |
+| Item | Note |
 |---|---|
-| 键位 | START 打开菜单;**MENU 键无动作**(ES-DE 无 guide 动作,属设计如此) |
-| ROM | 标准布局 `/mnt/mmc/Roms/<机种小写>`(如 gba、sfc、fc),vfat 大小写不敏感,大写目录同样识别 |
-| 音量 | 游戏内音量走 RetroArch 原配置(与官方启动器一致) |
+| Buttons | START opens the menu; **the MENU button does nothing** (ES-DE has no guide action, by design) |
+| ROMs | Standard layout `/mnt/mmc/Roms/<lowercase system>` (e.g. gba, sfc, fc). vfat is case-insensitive, so uppercase dirs work too |
+| Volume | In-game volume uses the original RetroArch config (same as the stock launcher) |
 
-## 主题
+## Themes
 
-本机实测推荐 **art-book-next**(作者 Anthony Caccese):https://github.com/anthonycaccese/art-book-next-es-de —— 720x480 低分辨率下显示正常。
+Recommended on this device: **art-book-next** by Anthony Caccese — https://github.com/anthonycaccese/art-book-next-es-de — verified to display correctly at 720x480.
 
-安装步骤:
-1. 从上面的仓库下载 zip(Code → Download ZIP)
-2. 解压出 `art-book-next-es-de-main/` 文件夹
-3. 放到 `/mnt/data/es-de-home/ES-DE/themes/`(该目录由 ES-DE 首次启动自动创建)
-4. 重启 ES-DE,界面里选择该主题即可
+Installation steps:
+1. Download the zip from the repo above (Code → Download ZIP)
+2. Extract the `art-book-next-es-de-main/` folder
+3. Place it in `/mnt/data/es-de-home/ES-DE/themes/` (this directory is auto-created by ES-DE on first launch)
+4. Restart ES-DE and select the theme in the UI
 
-## 已知限制
+## Known limitations
 
-1. **ES-DE 界面无声音**(`SDL_AUDIODRIVER=dummy`):ES-DE 3.x 需 PulseAudio/PipeWire,本机未装。游戏内声音不受影响
-2. **盖屏待机未实现**:官方启动器的翻盖关屏/超级待机逻辑内置在 muos1.bin 中,ES-DE 不自带。未来计划以 lid 守护脚本补上(超级待机实测机制已摸清,见项目文档 `OFFICIAL_LAUNCHER.md`)
-3. USB 手柄:标准 SDL 手柄自动支持;内置手柄映射文件针对 `ANBERNIC-keys`(GUID `19002cb4...`),不同固件版本若识别名不同,需重新配置键位
+1. **No UI sounds** (`SDL_AUDIODRIVER=dummy`): ES-DE 3.x needs PulseAudio/PipeWire, which this system doesn't ship. In-game sound is unaffected.
+2. **Lid-close standby not implemented**: the stock launcher's lid-close screen-off / super standby logic is built into muos1.bin itself. A lid daemon is planned for the future (the super-standby mechanism has been fully reverse-engineered and documented in the project notes).
+3. USB gamepads: standard SDL controllers are auto-supported. The built-in pad mapping targets `ANBERNIC-keys` (GUID `19002cb4...`); if a different firmware version exposes a different device name, the key mapping needs reconfiguration.
 
-## 故障排查
+## Troubleshooting
 
-| 现象 | 原因与处理 |
+| Symptom | Cause & fix |
 |---|---|
-| ES-DE 秒退,log 报 `FcWeightFromOpenTypeDouble` | fontconfig 被厂商游戏启动脚本翻到 1.10.1;用 ES-DE.sh 启动会自动翻回 1.12.0(重启 ES-DE 即可) |
-| 启动游戏闪退,RA_launch.log 报 `wrong ELF class` | wrapper 环境缺失;确认 `/mnt/data/retroarch-wrapper.sh` 存在且含 32 位库路径 |
-| 找不到游戏 | 确认 ROM 在 `/mnt/mmc/Roms/<机种>/`;或改 `es_settings.xml` 的 `ROMDirectory` |
-| 键位不对 | 重新校准:删除 `/mnt/data/es-de-home/ES-DE/settings/es_input.xml` 后进 ES-DE 重配 |
+| ES-DE exits instantly, log shows `FcWeightFromOpenTypeDouble` | fontconfig was flipped to 1.10.1 by the vendor's game launch script; launching via ES-DE.sh flips it back to 1.12.0 (just restart ES-DE) |
+| Game flash-crashes, RA_launch.log shows `wrong ELF class` | Missing wrapper environment; make sure `/mnt/data/retroarch-wrapper.sh` exists and sets the 32-bit library path |
+| No games found | Check ROMs are under `/mnt/mmc/Roms/<system>/`, or edit `ROMDirectory` in `es_settings.xml` |
+| Wrong key mapping | Reconfigure: delete `/mnt/data/es-de-home/ES-DE/settings/es_input.xml`, then remap in ES-DE |
 
-日志位置:ES-DE 内部 `/mnt/data/es-de-home/ES-DE/logs/es_log.txt`;启动脚本 stdout `/mnt/mmc/Roms/APPS/esde/log.txt`;游戏启动 trace `/mnt/mod/ctrl/configs/RA_launch.log`。
+Log locations: ES-DE internal `/mnt/data/es-de-home/ES-DE/logs/es_log.txt`; launcher stdout `/mnt/mmc/Roms/APPS/esde/log.txt`; game launch trace `/mnt/mod/ctrl/configs/RA_launch.log`.
 
-## 构建
+## Build
 
-本项目是 ES-DE 3.4.1 在 H700/DeepPlayOS 上的移植发行版,构建配方见 [BUILD.md](BUILD.md)。ES-DE 本体为 MIT 许可(见 LICENSE),上游源码:https://gitlab.com/es-de/emulationstation-de
+This repo is a port/distribution of ES-DE v3.4.1 for H700/DeepPlayOS; the exact build recipe is in [BUILD.md](BUILD.md). ES-DE itself is MIT-licensed (see LICENSE); upstream source: https://gitlab.com/es-de/emulationstation-de
 
-## 致谢
+## Credits
 
-ES-DE 作者 Leon Styhre / Northwestern Software AB;Anbernic H700 社区。
+ES-DE authors: Leon Styhre / Northwestern Software AB. The Anbernic H700 community.

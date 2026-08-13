@@ -1,54 +1,58 @@
-# 构建配方(在 H700 / DeepPlayOS 设备上本机编译)
+# Build Recipe (native build on H700 / DeepPlayOS)
 
-> 记录本发行版二进制(`esde/es-de`)的确切构建方法。上游源码:v3.4.1,https://gitlab.com/es-de/emulationstation-de
+> Documents exactly how the `esde/es-de` binary in this repo was produced. Upstream source: v3.4.1, https://gitlab.com/es-de/emulationstation-de
+> [中文版](BUILD_zh.md)
 
-## 前置条件
+## Prerequisites
 
-- 原厂 DeepPlayOS(Ubuntu 22.04 aarch64,内核 4.9.170,root SSH)
-- 磁盘:`/` 剩余 ≥1.5G(apt 依赖),编译目录放 `/mnt/data`(≥1G)
-- 内存 1.9G:**必须先建 swapfile**,否则 `GuiScraperMenu.cpp` 单文件编译 OOM(-j1 也扛不住)
+- Stock DeepPlayOS (Ubuntu 22.04 aarch64, kernel 4.9.170, root SSH access)
+- Disk: `/` needs ≥1.5 GB free (apt dependencies); build directory on `/mnt/data` (≥1 GB)
+- RAM 1.9 GB: **a swapfile is mandatory** — `GuiScraperMenu.cpp` alone exceeds 1.9 GB during compilation (OOM even with `-j1`)
 
-## 步骤
+## Steps
 
 ```bash
-# 1. swapfile
+# 1. Swapfile
 dd if=/dev/zero of=/mnt/data/swapfile bs=1M count=1536
 mkswap /mnt/data/swapfile && swapon /mnt/data/swapfile
 
-# 2. 依赖(清华源;注意:故意不装 libsdl2-dev,会污染厂商 mali 版 SDL2)
+# 2. Dependencies (Tsinghua mirror; note: deliberately NO libsdl2-dev —
+#    the apt/mesa SDL2 would pollute the vendor's mali-enabled SDL2)
 apt-get install -y --no-install-recommends build-essential clang-format git cmake gettext \
   libharfbuzz-dev libicu-dev libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev \
   libfreeimage-dev libfreetype6-dev libgit2-dev libcurl4-openssl-dev libpugixml-dev \
   libasound2-dev libbluetooth-dev libpoppler-cpp-dev libgles2-mesa-dev
 
-# 3. SDL2 头:ES-DE 需要 SDL_locale.h(2.0.14+),厂商自带头是 2.0.12
-#    下载 SDL2-2.28.5 源码包(libsdl.org),把 include/*.h 覆盖到 /usr/include/SDL2/
-#    注意:SDL_config.h 也会被替换(2.28.5 源码包自带),不影响运行(头仅编译期用)
-#    运行时库用厂商 BSP 自带的 /usr/lib/aarch64-linux-gnu/libSDL2-2.0.so.0.2800.5(自带 mali 驱动)
+# 3. SDL2 headers: ES-DE needs SDL_locale.h (SDL 2.0.14+), vendor headers are 2.0.12.
+#    Download the SDL2-2.28.5 source tarball (libsdl.org) and overwrite /usr/include/SDL2/
+#    with include/*.h. Note: SDL_config.h is also replaced (the tarball ships its own);
+#    headers are compile-time only, so this does not affect the runtime.
+#    Runtime library: the vendor BSP already ships /usr/lib/aarch64-linux-gnu/libSDL2-2.0.so.0.2800.5
+#    (with the mali video driver).
 
-# 4. cmake 配置(构建目录 /mnt/data/build)
+# 4. CMake configuration (build dir on /mnt/data)
 mkdir -p /mnt/data/build && cd /mnt/data/build
 cmake -DGLES=on -DHINT_GLES_LIBNAME=mali -DHINT_GLES_LIBDIR=/usr/lib \
   -DCMAKE_BUILD_TYPE=Release \
   -DSDL2_INCLUDE_DIR=/usr/include/SDL2 \
   -DSDL2_LIBRARY=/usr/lib/aarch64-linux-gnu/libSDL2.so \
-  <源码目录>
+  <source dir>
 
-# 5. 编译
+# 5. Compile
 make -j1
-# 产物:源码根目录下的 es-de(CMake 输出路径惯例,不在 build 目录)
+# Output: es-de in the SOURCE ROOT (ES-DE's CMake output convention, not in the build dir)
 ```
 
-## 运行环境要求(install.sh 会检查)
+## Runtime environment requirements (checked by install.sh)
 
-- 32 位 RetroArch `/mnt/vendor/deep/retro/retroarch`(v1.22,armhf)+ 32 位 cores
-- `/mnt/mod/ctrl/RA_launch.sh`(muOS 版启动器自带)
-- `/usr/lib/libmali.so`(64 位)+ `/usr/lib32/` 32 位库环境
-- SDL2 2.28.x 带 mali 驱动(厂商 BSP)
-- `/mnt/data/mali-lib/`:libEGL/libGLESv2/libGLESv1_CM/libGLES_CM → libmali.so;libSDL2-2.0.so.0 → 2.28.x
+- 32-bit RetroArch `/mnt/vendor/deep/retro/retroarch` (v1.22, armhf) + 32-bit cores
+- `/mnt/mod/ctrl/RA_launch.sh` (ships with the muOS-style stock launcher)
+- `/usr/lib/libmali.so` (64-bit) + the 32-bit lib environment under `/usr/lib32/`
+- Vendor SDL2 2.28.x with the mali driver
+- `/mnt/data/mali-lib/`: libEGL/libGLESv2/libGLESv1_CM/libGLES_CM → libmali.so; libSDL2-2.0.so.0 → 2.28.x
 
-## 已知环境坑(构建/运行都会踩)
+## Known pitfalls (build & run)
 
-1. **fontconfig 争夺**:RA_launch.sh 启动游戏前把 `libfontconfig.so.1` 翻到 1.10.1(32 位 RA 需要),64 位应用(ES-DE 的 libpangoft2)需要 1.12.0 的 `FcWeightFromOpenTypeDouble` → ES-DE.sh 启动前翻回 1.12.0
-2. **32 位环境隔离**:ES-DE 的 LD_LIBRARY_PATH(64 位 mali-lib)会继承给游戏进程 → wrapper 必须重建 `/usr/lib32:/usr/lib:/mnt/vendor/lib`
-3. **libmali 直链**:链接报 `.dynsym` 裁剪警告属厂商 blob 正常现象,不影响
+1. **fontconfig tug-of-war**: `RA_launch.sh` flips `libfontconfig.so.1` to 1.10.1 before launching the 32-bit RetroArch (which needs it); 64-bit apps (ES-DE's libpangoft2) need `FcWeightFromOpenTypeDouble`, which only exists in 1.12.0 → ES-DE.sh flips it back to 1.12.0 at launch
+2. **32-bit environment isolation**: ES-DE's LD_LIBRARY_PATH (64-bit mali-lib) is inherited by game processes → the wrapper must rebuild `/usr/lib32:/usr/lib:/mnt/vendor/lib`
+3. **libmali direct linking**: the linker emits `.dynsym` truncation warnings — a known quirk of the vendor blob, harmless
