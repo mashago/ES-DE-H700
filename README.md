@@ -34,9 +34,18 @@ rm -rf /mnt/data/es-de-home /mnt/data/mali-lib /mnt/data/retroarch-wrapper.sh
 | 事项 | 说明 |
 |---|---|
 | 键位 | START 打开菜单;**MENU 键无动作**(ES-DE 无 guide 动作,属设计如此) |
-| 主题 | 解压主题文件夹到 `/mnt/data/es-de-home/ES-DE/themes/`;本机实测 `art-book-next` 在 720x480 显示正常 |
 | ROM | 标准布局 `/mnt/mmc/Roms/<机种小写>`(如 gba、sfc、fc),vfat 大小写不敏感,大写目录同样识别 |
 | 音量 | 游戏内音量走 RetroArch 原配置(与官方启动器一致) |
+
+## 主题
+
+本机实测推荐 **art-book-next**(作者 Anthony Caccese):https://github.com/anthonycaccese/art-book-next-es-de —— 720x480 低分辨率下显示正常。
+
+安装步骤:
+1. 从上面的仓库下载 zip(Code → Download ZIP)
+2. 解压出 `art-book-next-es-de-main/` 文件夹
+3. 放到 `/mnt/data/es-de-home/ES-DE/themes/`(该目录由 ES-DE 首次启动自动创建)
+4. 重启 ES-DE,界面里选择该主题即可
 
 ## 已知限制
 
