@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<inputList>
+    <inputConfig type="controller" deviceName="ANBERNIC-keys" deviceGUID="19002cb4010000000100000000010000">
+        <input name="Up" type="button" id="11" value="1" />
+        <input name="Down" type="button" id="12" value="1" />
+        <input name="Left" type="button" id="13" value="1" />
+        <input name="Right" type="button" id="14" value="1" />
+        <input name="A" type="button" id="0" value="1" />
+        <input name="B" type="button" id="1" value="1" />
+        <input name="X" type="button" id="2" value="1" />
+        <input name="Y" type="button" id="3" value="1" />
+        <input name="Back" type="button" id="4" value="1" />
+        <input name="Start" type="button" id="6" value="1" />
+        <input name="LeftShoulder" type="button" id="9" value="1" />
+        <input name="RightShoulder" type="button" id="10" value="1" />
+        <input name="LeftTrigger" type="axis" id="4" value="1" />
+        <input name="RightTrigger" type="axis" id="5" value="1" />
+    </inputConfig>
+</inputList>
