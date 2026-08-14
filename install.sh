@@ -1,9 +1,9 @@
 #!/bin/bash
-# ES-DE for Anbernic H700 (DeepPlayOS) 安装/升级脚本
+# ES-DE for Anbernic H700 (原厂固件) 安装/升级脚本
 # 用法:把本仓库放到掌机任意目录,cd 到仓库根目录后运行:
 #   sh install.sh          全新安装(不覆盖已有用户配置)
 #   sh install.sh upgrade  升级:同步程序/资源/脚本 + 模板配置带 .bak 备份更新
-# 前提:原厂 DeepPlayOS(带 muos/dmenu 启动器),SSH root 登录
+# 前提:Anbernic 原厂固件(带 muos/dmenu 启动器),SSH root 登录
 set -e
 
 MODE="${1:-install}"
@@ -26,7 +26,7 @@ fail=0
 [ -x /mnt/vendor/deep/retro/retroarch ] || { echo "  ✗ 找不到 32 位 RetroArch(/mnt/vendor/deep/retro/retroarch)"; fail=1; }
 [ -f /mnt/mod/ctrl/RA_launch.sh ] || { echo "  ✗ 找不到 RA_launch.sh(需要 muOS 版启动器的系统)"; fail=1; }
 [ -f /usr/lib/libmali.so ] || { echo "  ✗ 找不到 libmali"; fail=1; }
-[ -f /mnt/vendor/ctrl/dmenu_ln ] || { echo "  ✗ 找不到 dmenu_ln(不是原厂 DeepPlayOS?)"; fail=1; }
+[ -f /mnt/vendor/ctrl/dmenu_ln ] || { echo "  ✗ 找不到 dmenu_ln(不是Anbernic 原厂固件?)"; fail=1; }
 SDL28="$(ls /usr/lib/aarch64-linux-gnu/libSDL2-2.0.so.0.28* 2>/dev/null | head -1)"
 [ -n "$SDL28" ] || { echo "  ✗ 找不到 SDL2 2.28.x(需要厂商 BSP 自带带 mali 驱动的版本)"; fail=1; }
 [ "$fail" -eq 1 ] && { echo "依赖检查失败,终止安装"; exit 1; }

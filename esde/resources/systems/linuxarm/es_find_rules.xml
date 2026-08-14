@@ -16,7 +16,7 @@
         <rule type="staticpath">
             <entry>/var/lib/flatpak/exports/bin/org.libretro.RetroArch</entry>
             <entry>~/.local/share/flatpak/exports/bin/org.libretro.RetroArch</entry>
-            <!-- Anbernic H700 DeepPlayOS (wrapper 重建 32 位库环境) -->
+            <!-- Anbernic H700 原厂固件 (wrapper 重建 32 位库环境) -->
             <entry>/mnt/data/retroarch-wrapper.sh</entry>
         </rule>
     </emulator>
@@ -24,7 +24,7 @@
         <rule type="corepath">
             <!-- Non-portable AppImage and compiled from source -->
             <entry>~/.config/retroarch/cores</entry>
-            <!-- Anbernic H700 DeepPlayOS -->
+            <!-- Anbernic H700 原厂固件 -->
             <entry>/mnt/vendor/deep/retro/cores</entry>
             <!-- Alternative location used on some distributions such as Debian -->
             <entry>~/.config/retroarch/libretro</entry>

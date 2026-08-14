@@ -1,6 +1,6 @@
 # 官方启动器(muos1.bin)调研手册
 
-> 设备:Anbernic RG34XXSP(H700 / DeepPlayOS,Ubuntu 22.04 aarch64)
+> 设备:Anbernic RG34XXSP(H700 / 原厂固件,Ubuntu 22.04 aarch64)
 > 调研日期:2026-08-13
 > 目的:记录官方启动器的位置、启动方式、内置功能、外部脚本调用,为 ES-DE 集成(替换/共存)提供依据。
 > 调研方法:读取启动链脚本 + `strings` 提取二进制内嵌文本 + 内核日志/sysfs 实测。

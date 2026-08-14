@@ -1,4 +1,4 @@
-# ES-DE for Anbernic H700 (Stock DeepPlayOS)
+# ES-DE for Anbernic H700 (Stock Firmware)
 
 Run **ES-DE 3.4.1** (OpenGL ES renderer, hardware accelerated) on **Anbernic H700 handhelds** (RG34XXSP / RG35XX Plus / RG35XX H / RG35XX SP / RG35XX 2024 / RG40XX H / RG40XX V / RG28XX / RG CUBEXX / RG34XX) **while keeping the stock system** — delivered as a dmenu APPS application.
 
@@ -115,7 +115,7 @@ Log locations: ES-DE internal `/mnt/data/es-de-home/ES-DE/logs/es_log.txt`; laun
 
 ## Build
 
-This repo is a port/distribution of ES-DE v3.4.1 for H700/DeepPlayOS; the exact build recipe is in [BUILD.md](BUILD.md). ES-DE itself is MIT-licensed (see LICENSE); upstream source: https://gitlab.com/es-de/emulationstation-de
+This repo is a port/distribution of ES-DE v3.4.1 for H700/the stock Anbernic firmware; the exact build recipe is in [BUILD.md](BUILD.md). ES-DE itself is MIT-licensed (see LICENSE); upstream source: https://gitlab.com/es-de/emulationstation-de
 
 ## Credits
 

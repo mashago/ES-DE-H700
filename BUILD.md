@@ -1,11 +1,11 @@
-# Build Recipe (native build on H700 / DeepPlayOS)
+# Build Recipe (native build on H700 / the stock Anbernic firmware)
 
 > Documents exactly how the `esde/es-de` binary in this repo was produced. Upstream source: v3.4.1, https://gitlab.com/es-de/emulationstation-de
 > [中文版](BUILD_zh.md)
 
 ## Prerequisites
 
-- Stock DeepPlayOS (Ubuntu 22.04 aarch64, kernel 4.9.170, root SSH access)
+- Stock Firmware (Ubuntu 22.04 aarch64, kernel 4.9.170, root SSH access)
 - Disk: `/` needs ≥1.5 GB free (apt dependencies); build directory on `/mnt/data` (≥1 GB)
 - RAM 1.9 GB: **a swapfile is mandatory** — `GuiScraperMenu.cpp` alone exceeds 1.9 GB during compilation (OOM even with `-j1`)
 

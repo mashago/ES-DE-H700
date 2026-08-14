@@ -1,11 +1,11 @@
-# 构建配方(在 H700 / DeepPlayOS 设备上本机编译)
+# 构建配方(在 H700 / 原厂固件 设备上本机编译)
 
 > 记录本发行版二进制(`esde/es-de`)的确切构建方法。上游源码:v3.4.1,https://gitlab.com/es-de/emulationstation-de
 > [English version](BUILD.md)
 
 ## 前置条件
 
-- 原厂 DeepPlayOS(Ubuntu 22.04 aarch64,内核 4.9.170,root SSH)
+- Anbernic 原厂固件(Ubuntu 22.04 aarch64,内核 4.9.170,root SSH)
 - 磁盘:`/` 剩余 ≥1.5G(apt 依赖),编译目录放 `/mnt/data`(≥1G)
 - 内存 1.9G:**必须先建 swapfile** —— `GuiScraperMenu.cpp` 单文件编译峰值超 1.9G(`-j1` 也扛不住,实测 OOM)
 

@@ -1,4 +1,4 @@
-# ES-DE for Anbernic H700(原厂 DeepPlayOS)
+# ES-DE for Anbernic H700(Anbernic 原厂固件)
 
 在 **Anbernic H700 系列掌机**(RG34XXSP / RG35XX Plus / RG35XX H / RG35XX SP / RG35XX 2024 / RG40XX H / RG40XX V / RG28XX / RG CUBEXX / RG34XX)**保留原厂系统**的情况下,以 **dmenu APPS 应用形态**运行 ES-DE 3.4.1(OpenGL ES 渲染,硬件加速)。
 
@@ -115,7 +115,7 @@ python3 generate-gamelists.py      # 批量预生成全部 gamelist(合并模式
 
 ## 构建
 
-本项目是 ES-DE 3.4.1 在 H700/DeepPlayOS 上的移植发行版,构建配方见 [BUILD_zh.md](BUILD_zh.md)。ES-DE 本体为 MIT 许可(见 LICENSE),上游源码:https://gitlab.com/es-de/emulationstation-de
+本项目是 ES-DE 3.4.1 在 H700/原厂固件 上的移植发行版,构建配方见 [BUILD_zh.md](BUILD_zh.md)。ES-DE 本体为 MIT 许可(见 LICENSE),上游源码:https://gitlab.com/es-de/emulationstation-de
 
 ## 致谢
 
