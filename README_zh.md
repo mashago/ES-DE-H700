@@ -16,6 +16,10 @@
 - **待机(超级待机)**:合盖**或按电源键**整机挂起 —— ES-DE 菜单场景由 standby-daemon 实现,游戏场景走厂商原生通路;电源键唤醒,与原机体验一致
 - 主题、刮削、收藏等 ES-DE 完整功能
 
+## 截图
+
+<img src="screenshots/screenshot1.jpg" width="320"> <img src="screenshots/screenshot2.jpg" width="320"> <img src="screenshots/screenshot3.jpg" width="320">
+
 ## 仓库结构
 
 ```

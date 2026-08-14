@@ -16,6 +16,10 @@ No reflash, no system replacement, no boot-chain changes. Launch ES-DE from dmen
 - **Standby (super standby)**: closing the lid **or pressing the power key** suspends the system — in the ES-DE menu (via `standby-daemon.py`) and in-game (via the vendor's native path). Press the power key to wake, exactly like the stock launcher.
 - Full ES-DE features: themes, scraping, collections, favorites
 
+## Screenshots
+
+<img src="screenshots/screenshot1.jpg" width="320"> <img src="screenshots/screenshot2.jpg" width="320"> <img src="screenshots/screenshot3.jpg" width="320">
+
 ## Repository structure
 
 ```
