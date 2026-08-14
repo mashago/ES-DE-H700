@@ -15,6 +15,32 @@ No reflash, no system replacement, no boot-chain changes. Launch ES-DE from dmen
 - Precise built-in gamepad mapping (D-pad/A/B/X/Y/L1/L2/R1/R2/SELECT/START; ROMs auto-scanned from `/mnt/mmc/Roms`)
 - Full ES-DE features: themes, scraping, collections, favorites
 
+## Repository structure
+
+```
+ES-DE-H700/
+├── README.md / README_zh.md        ← this document (EN / 中文)
+├── BUILD.md / BUILD_zh.md          ← how the es-de binary was built (EN / 中文)
+├── LICENSE                         ← ES-DE license (MIT)
+├── install.sh                      ← one-click installer (dependency check → symlinks → deploy)
+├── esde/
+│   ├── es-de                       ← ES-DE 3.4.1 binary (OpenGL ES build, Mali-G31)
+│   └── resources/                  ← runtime data: system definitions (es_systems.xml /
+│   │                                 es_find_rules.xml), MAME data, fonts, locales,
+│   │                                 shaders, sounds, graphics
+├── ES-DE.sh                        ← launcher script (env setup + fontconfig fix + --home)
+├── home-template/ES-DE/            ← user data template, copied to /mnt/data/es-de-home/ES-DE/
+│   ├── settings/es_settings.xml    ← main settings (only ROMDirectory is preset:
+│   │                                 /mnt/mmc/Roms/; ES-DE auto-creates the rest)
+│   ├── settings/es_input.xml       ← key mapping: SDL standard buttons → ES-DE actions
+│   └── controllers/es_controller_mappings.cfg
+│                                   ← SDL gamecontroller mapping fix (the built-in
+│                                     SDL db entry for ANBERNIC-keys is wrong)
+└── retroarch-wrapper.sh            ← game launch delegation: translates ES-DE's
+                                      "-L <core> <rom>" into the vendor's
+                                      RA_launch.sh <core> <rom> with the 32-bit lib env
+```
+
 ## Installation
 
 Copy this repo to any directory on the handheld (suggested: under `/mnt/mmc/`), then over SSH:

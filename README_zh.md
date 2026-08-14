@@ -15,6 +15,32 @@
 - 内置手柄精确映射(A/B/X/Y/L1/L2/R1/R2/方向/SELECT/START;ROM 目录自动扫描 `/mnt/mmc/Roms`)
 - 主题、刮削、收藏等 ES-DE 完整功能
 
+## 仓库结构
+
+```
+ES-DE-H700/
+├── README.md / README_zh.md        ← 本说明(英文 / 中文)
+├── BUILD.md / BUILD_zh.md          ← es-de 二进制的构建方法(英文 / 中文)
+├── LICENSE                         ← ES-DE 许可证(MIT)
+├── install.sh                      ← 一键安装脚本(依赖检查 → 软链 → 部署)
+├── esde/
+│   ├── es-de                       ← ES-DE 3.4.1 二进制(OpenGL ES 构建,Mali-G31)
+│   └── resources/                  ← 运行时数据:系统定义(es_systems.xml /
+│   │                                 es_find_rules.xml)、MAME 数据、字体、多语言、
+│   │                                 着色器、音效、图形
+├── ES-DE.sh                        ← 启动脚本(环境变量 + fontconfig 修复 + --home)
+├── home-template/ES-DE/            ← 用户数据模板,安装时拷到 /mnt/data/es-de-home/ES-DE/
+│   ├── settings/es_settings.xml    ← 主设置(仅预置 ROMDirectory=/mnt/mmc/Roms/,
+│   │                                 其余由 ES-DE 自动生成)
+│   ├── settings/es_input.xml       ← 键位映射:SDL 标准按钮 → ES-DE 动作
+│   └── controllers/es_controller_mappings.cfg
+│                                   ← SDL 手柄映射修正(SDL 内置 db 对
+│                                     ANBERNIC-keys 的条目是错的)
+└── retroarch-wrapper.sh            ← 游戏启动委托:把 ES-DE 的 "-L <core> <rom>"
+                                      翻译为厂商的 RA_launch.sh <core> <rom>,
+                                      并重建 32 位库环境
+```
+
 ## 安装
 
 把本仓库拷贝到掌机任意目录(建议 `/mnt/mmc/` 下),SSH 进去:
