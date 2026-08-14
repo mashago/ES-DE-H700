@@ -50,6 +50,8 @@ cp -f  "$REPO_DIR/esde/es-de"     "$APPS_DIR/esde/es-de"
 cp -f  "$REPO_DIR/ES-DE.sh"       "$APPS_DIR/ES-DE.sh"
 cp -f  "$REPO_DIR/lid-daemon.sh"  "/mnt/data/lid-daemon.sh"
 chmod +x "$APPS_DIR/ES-DE.sh" "$APPS_DIR/esde/es-de" "/mnt/data/lid-daemon.sh"
+mkdir -p "$APPS_DIR/Imgs"
+cp -f  "$REPO_DIR/ES-DE.png"    "$APPS_DIR/Imgs/ES-DE.png"
 echo "  ✓ 程序安装完成"
 
 # ── 4. 用户目录模板 ─────────────────────────────────────
