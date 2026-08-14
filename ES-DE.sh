@@ -18,12 +18,12 @@ export LD_LIBRARY_PATH=/mnt/data/mali-lib
 export SDL_AUDIODRIVER=dummy
 export HOME=/
 
-# lid 守护(超级待机:合盖挂起,电源键唤醒;游戏中自动让位给厂商守护)
-LID_DAEMON="/mnt/data/lid-daemon.sh"
-if [ -x "$LID_DAEMON" ]; then
-    "$LID_DAEMON" &
-    LID_PID=$!
-    trap 'kill "$LID_PID" 2>/dev/null' EXIT
+# 待机守护(合盖/电源键 → 挂起,电源键唤醒;游戏中自动让位给厂商守护)
+STANDBY_DAEMON="/mnt/data/standby-daemon.py"
+if [ -x "$STANDBY_DAEMON" ] && command -v python3 >/dev/null 2>&1; then
+    python3 "$STANDBY_DAEMON" &
+    STANDBY_PID=$!
+    trap 'kill "$STANDBY_PID" 2>/dev/null' EXIT
 fi
 
 cd "${progdir}/esde"

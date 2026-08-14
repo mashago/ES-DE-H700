@@ -13,7 +13,7 @@
 - ES-DE 3.4.1 自编译 **OpenGL ES 版**(Mali-G31 硬件渲染,GLES 3.2,720x480 满帧)
 - 游戏启动走**厂商原路**(`RA_launch.sh`):边框、着色器、按机种配置、自动读档/存盘全部与官方启动器一致
 - 内置手柄精确映射(A/B/X/Y/L1/L2/R1/R2/方向/SELECT/START;ROM 目录自动扫描 `/mnt/mmc/Roms`)
-- **盖屏超级待机**:合盖整机挂起 —— ES-DE 菜单场景由 lid-daemon 实现,游戏场景走厂商原生通路;开盖后按电源键唤醒,与原机体验一致
+- **待机(超级待机)**:合盖**或按电源键**整机挂起 —— ES-DE 菜单场景由 standby-daemon 实现,游戏场景走厂商原生通路;电源键唤醒,与原机体验一致
 - 主题、刮削、收藏等 ES-DE 完整功能
 
 ## 仓库结构
@@ -31,8 +31,8 @@ ES-DE-H700/
 │   │                                 着色器、音效、图形
 ├── ES-DE.sh                        ← 启动脚本(环境变量 + fontconfig 修复 + --home
 │                                     + lid 守护启停)
-├── lid-daemon.sh                   ← 盖屏守护:合盖挂起(echo mem),电源键唤醒;
-│                                     安装到 /mnt/data/
+├── standby-daemon.py               ← 待机守护:合盖或电源键 → 挂起(echo mem),
+│                                     电源键唤醒;安装到 /mnt/data/
 ├── home-template/ES-DE/            ← 用户数据模板,安装时拷到 /mnt/data/es-de-home/ES-DE/
 │   ├── settings/es_settings.xml    ← 主设置(预置 ROMDirectory=/mnt/mmc/Roms/ +
 │   │                                 CustomEventScripts)

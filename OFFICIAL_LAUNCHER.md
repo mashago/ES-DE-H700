@@ -188,25 +188,34 @@ echo mem > /sys/power/state     # 标准内核挂起,与厂商同源
 # 唤醒:电源键(PMIC 硬件);唤醒后需先观察到开盖才重新武装
 ```
 
-### 3.4 ES-DE lid 守护(2026-08-14 实施,验收通过)
+### 3.4 ES-DE 待机守护(2026-08-14 实施,含合盖+电源键,验收通过)
 
-**架构**:独立小脚本 `lid-daemon.sh`(发行包内,安装到 `/mnt/data/`),由 ES-DE.sh 启动、ES-DE 退出时 trap 杀掉;每 1 秒轮询 `hallkey`。
+**架构**:`standby-daemon.py`(python3 单进程,发行包内,安装到 `/mnt/data/`),由 ES-DE.sh 启动、ES-DE 退出时 trap 杀掉。**两个触发源汇聚一个挂起动作**:
 
-**最终实现**(调研全程修正,详见 3.3 与 /tmp/vendor_sleep_trace.log 实测):
-```bash
-# 合盖(hallkey 连续 2 次为 0 去抖,且 /tmp/esde_game_running 不存在):
-echo mem > /sys/power/state       # 标准内核挂起 —— 与厂商 os_sleep 通路同源!
-# 唤醒:电源键(PMIC 硬件);唤醒后需先观察到开盖(hallkey=1)才重新武装
 ```
+standby-daemon.py(单线程:select 监听 event0 + 轮询 hallkey)
+├── 触发 1:电源键(KEY_POWER=116 按下事件)
+├── 触发 2:合盖(hallkey 连续 2 次为 0 去抖)
+├── 共同守卫:/tmp/esde_game_running(游戏中让位,厂商/RA 原生处理)
+└── 唯一动作:echo mem > /sys/power/state
+```
+
+**防误触设计**:
+- 合盖:唤醒后需先观察到开盖(hallkey=1)才重新武装
+- 电源键:**唤醒后 5 秒冷却 + 清空 event0 队列**(唤醒那次按键的 press/release 残留在队列,不处理会唤醒瞬间二次挂起)
+- 原机"M 键+电源=关机"组合键不复刻(只做短按挂起),README 注明
+
+**电源键无反应的根因(2026-08-14 evtest 实测)**:KEY_POWER 事件完整到达内核(event0,evtest 捕获 press/release),PMIC 驱动有反应(set_my_work_lowpwr_led 打印),但**用户态无人处理** —— 平时处理电源键的是 muos1.bin,它退出后没人接管(与合盖"白名单变暗"是同一类设计)。
 
 **关键调研结论(2026-08-14,纠正早期假设)**:
 1. **厂商超级待机的睡眠 = 标准内核 mem 挂起**(dmesg -w 实测捕获:`PM: Preparing system for sleep (mem)`,与 echo mem 完全相同),所谓 os_sleep 不是独立睡眠通路
 2. `os_sleep` sysfs 节点是 **PMIC 配置接口**:每 1.1 秒写入值 1 = 厂商守护的"上膛"(内核打印 `os_sleep_type= 1` 即此);其他值(0/2/3/5/10)被静默拒绝;真正触发挂起的就是写 mem
 3. **厂商守护的"白名单"行为**:合盖后只对自家启动器/游戏执行挂起,对陌生应用(ES-DE 等)只做变暗 —— 这就是"ES-DE 前台合盖无反应"的根因(守护身份未实锤,cexpert 无 hall 字符串)
-4. 游戏中(RA 前台)合盖挂起由厂商守护原生处理(实测可用)→ lid-daemon 用 ES-DE 事件脚本标志(game-start/game-end 维护 /tmp/esde_game_running)**主动让位**,防双重挂起
+4. 游戏中(RA 前台)合盖挂起由厂商守护原生处理(实测可用)→ standby-daemon 用 ES-DE 事件脚本标志(game-start/game-end 维护 /tmp/esde_game_running)**主动让位**,防双重挂起
+5. 电源键在 ES-DE 前台无反应(evtest 实测事件到达内核但用户态无人接管),standby-daemon 一并补上(2026-08-14 增补)
 5. WiFi/充电唤醒行为差异:短睡眠 WiFi 不断(厂商长睡眠断);充电是否唤醒待实测(axp2202-usb wakeup=enabled 但 wakeup_count=0)
 
-**验收结果(2026-08-14 实测)**:菜单合盖→挂起→电源键→回 ES-DE(2 个周期);游戏中合盖→挂起→电源键→回游戏;退出 ES-DE 后 daemon 被杀、原机待机不受影响。
+**验收结果(2026-08-14 实测)**:菜单电源键→挂起→电源键→回 ES-DE(9s 周期,无二次挂起);菜单合盖→挂起→电源键→回 ES-DE(回归);游戏中让位正常;退出 ES-DE 后 daemon 被杀、原机待机不受影响。
 
 **正常待机(只关屏)未实现**(用户决定不需要):候选背光点 fb0 blank / cexpert 的变暗动作,留档备查。
 

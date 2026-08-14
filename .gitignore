@@ -3,3 +3,5 @@ esde/log.txt
 esde/ROMs/
 *.log
 *.swp
+__pycache__/
+*.pyc

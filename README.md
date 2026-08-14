@@ -13,7 +13,7 @@ No reflash, no system replacement, no boot-chain changes. Launch ES-DE from dmen
 - ES-DE 3.4.1 self-built **OpenGL ES edition** (Mali-G31 hardware rendering, GLES 3.2, full speed at 720x480)
 - Games launch via the **vendor's own path** (`RA_launch.sh`): bezels, shaders, per-system RetroArch configs, savestate auto-load/save — identical behavior to the stock launcher
 - Precise built-in gamepad mapping (D-pad/A/B/X/Y/L1/L2/R1/R2/SELECT/START; ROMs auto-scanned from `/mnt/mmc/Roms`)
-- **Lid standby (super standby)**: closing the lid suspends the system — in the ES-DE menu (via `lid-daemon.sh`) and in-game (via the vendor's native path). Open the lid and press the power key to wake, exactly like the stock launcher.
+- **Standby (super standby)**: closing the lid **or pressing the power key** suspends the system — in the ES-DE menu (via `standby-daemon.py`) and in-game (via the vendor's native path). Press the power key to wake, exactly like the stock launcher.
 - Full ES-DE features: themes, scraping, collections, favorites
 
 ## Repository structure
@@ -31,8 +31,8 @@ ES-DE-H700/
 │   │                                 shaders, sounds, graphics
 ├── ES-DE.sh                        ← launcher script (env setup + fontconfig fix + --home
 │                                     + lid daemon start/kill)
-├── lid-daemon.sh                   ← lid standby daemon: lid close → suspend (echo mem),
-│                                     power key wakes; installed to /mnt/data/
+├── standby-daemon.py               ← standby daemon: lid close or power key → suspend
+│                                     (echo mem), power key wakes; installed to /mnt/data/
 ├── home-template/ES-DE/            ← user data template, copied to /mnt/data/es-de-home/ES-DE/
 │   ├── settings/es_settings.xml    ← main settings (ROMDirectory preset + CustomEventScripts)
 │   ├── settings/es_input.xml       ← key mapping: SDL standard buttons → ES-DE actions
