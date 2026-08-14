@@ -13,6 +13,7 @@ No reflash, no system replacement, no boot-chain changes. Launch ES-DE from dmen
 - ES-DE 3.4.1 self-built **OpenGL ES edition** (Mali-G31 hardware rendering, GLES 3.2, full speed at 720x480)
 - Games launch via the **vendor's own path** (`RA_launch.sh`): bezels, shaders, per-system RetroArch configs, savestate auto-load/save — identical behavior to the stock launcher
 - Precise built-in gamepad mapping (D-pad/A/B/X/Y/L1/L2/R1/R2/SELECT/START; ROMs auto-scanned from `/mnt/mmc/Roms`)
+- **Lid standby (super standby)**: closing the lid suspends the system — in the ES-DE menu (via `lid-daemon.sh`) and in-game (via the vendor's native path). Open the lid and press the power key to wake, exactly like the stock launcher.
 - Full ES-DE features: themes, scraping, collections, favorites
 
 ## Repository structure
@@ -28,14 +29,20 @@ ES-DE-H700/
 │   └── resources/                  ← runtime data: system definitions (es_systems.xml /
 │   │                                 es_find_rules.xml), MAME data, fonts, locales,
 │   │                                 shaders, sounds, graphics
-├── ES-DE.sh                        ← launcher script (env setup + fontconfig fix + --home)
+├── ES-DE.sh                        ← launcher script (env setup + fontconfig fix + --home
+│                                     + lid daemon start/kill)
+├── lid-daemon.sh                   ← lid standby daemon: lid close → suspend (echo mem),
+│                                     power key wakes; installed to /mnt/data/
 ├── home-template/ES-DE/            ← user data template, copied to /mnt/data/es-de-home/ES-DE/
-│   ├── settings/es_settings.xml    ← main settings (only ROMDirectory is preset:
-│   │                                 /mnt/mmc/Roms/; ES-DE auto-creates the rest)
+│   ├── settings/es_settings.xml    ← main settings (ROMDirectory preset + CustomEventScripts)
 │   ├── settings/es_input.xml       ← key mapping: SDL standard buttons → ES-DE actions
-│   └── controllers/es_controller_mappings.cfg
-│                                   ← SDL gamecontroller mapping fix (the built-in
-│                                     SDL db entry for ANBERNIC-keys is wrong)
+│   ├── controllers/es_controller_mappings.cfg
+│   │                               ← SDL gamecontroller mapping fix (the built-in
+│   │                                 SDL db entry for ANBERNIC-keys is wrong)
+│   └── scripts/game-start|game-end/game-flag.sh
+│                                   ← ES-DE event scripts: maintain the "game running"
+│                                     flag so the lid daemon yields to the vendor's
+│                                     native in-game standby
 └── retroarch-wrapper.sh            ← game launch delegation: translates ES-DE's
                                       "-L <core> <rom>" into the vendor's
                                       RA_launch.sh <core> <rom> with the 32-bit lib env
@@ -83,7 +90,7 @@ Installation steps:
 
 1. **No UI sounds** (`SDL_AUDIODRIVER=dummy`): the stock ALSA device is exclusive and its volume control is locked by the vendor's asound.conf hooks, so enabling audio would break in-game sound. In-game sound is unaffected. Full research: `AUDIO_RESEARCH.md`.
 2. **Four stock platforms not shown**: `HBMAME` (homebrew MAME), `PGM2`, `VARCADE` (vertical arcade) and `ONS` (ONScripter visual novels) have no equivalent systems in ES-DE; their games remain playable via the stock launcher.
-3. **Lid-close standby not implemented**: the stock launcher's lid-close screen-off / super standby logic is built into muos1.bin itself. A lid daemon is planned for the future (the super-standby mechanism has been fully reverse-engineered and documented in the project notes).
+3. **"Normal standby" (screen-off only) not implemented**: closing the lid always suspends (super standby), matching the stock behavior; the lighter screen-off-only mode is not supported.
 4. USB gamepads: standard SDL controllers are auto-supported. The built-in pad mapping targets `ANBERNIC-keys` (GUID `19002cb4...`); if a different firmware version exposes a different device name, the key mapping needs reconfiguration.
 
 ## Advanced: faster startup (optional)

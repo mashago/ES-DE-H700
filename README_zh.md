@@ -13,6 +13,7 @@
 - ES-DE 3.4.1 自编译 **OpenGL ES 版**(Mali-G31 硬件渲染,GLES 3.2,720x480 满帧)
 - 游戏启动走**厂商原路**(`RA_launch.sh`):边框、着色器、按机种配置、自动读档/存盘全部与官方启动器一致
 - 内置手柄精确映射(A/B/X/Y/L1/L2/R1/R2/方向/SELECT/START;ROM 目录自动扫描 `/mnt/mmc/Roms`)
+- **盖屏超级待机**:合盖整机挂起 —— ES-DE 菜单场景由 lid-daemon 实现,游戏场景走厂商原生通路;开盖后按电源键唤醒,与原机体验一致
 - 主题、刮削、收藏等 ES-DE 完整功能
 
 ## 仓库结构
@@ -28,14 +29,20 @@ ES-DE-H700/
 │   └── resources/                  ← 运行时数据:系统定义(es_systems.xml /
 │   │                                 es_find_rules.xml)、MAME 数据、字体、多语言、
 │   │                                 着色器、音效、图形
-├── ES-DE.sh                        ← 启动脚本(环境变量 + fontconfig 修复 + --home)
+├── ES-DE.sh                        ← 启动脚本(环境变量 + fontconfig 修复 + --home
+│                                     + lid 守护启停)
+├── lid-daemon.sh                   ← 盖屏守护:合盖挂起(echo mem),电源键唤醒;
+│                                     安装到 /mnt/data/
 ├── home-template/ES-DE/            ← 用户数据模板,安装时拷到 /mnt/data/es-de-home/ES-DE/
-│   ├── settings/es_settings.xml    ← 主设置(仅预置 ROMDirectory=/mnt/mmc/Roms/,
-│   │                                 其余由 ES-DE 自动生成)
+│   ├── settings/es_settings.xml    ← 主设置(预置 ROMDirectory=/mnt/mmc/Roms/ +
+│   │                                 CustomEventScripts)
 │   ├── settings/es_input.xml       ← 键位映射:SDL 标准按钮 → ES-DE 动作
-│   └── controllers/es_controller_mappings.cfg
-│                                   ← SDL 手柄映射修正(SDL 内置 db 对
-│                                     ANBERNIC-keys 的条目是错的)
+│   ├── controllers/es_controller_mappings.cfg
+│   │                               ← SDL 手柄映射修正(SDL 内置 db 对
+│   │                                 ANBERNIC-keys 的条目是错的)
+│   └── scripts/game-start|game-end/game-flag.sh
+│                                   ← ES-DE 事件脚本:维护"游戏运行中"标志,
+│                                     lid 守护据此把游戏场景让位给厂商原生待机
 └── retroarch-wrapper.sh            ← 游戏启动委托:把 ES-DE 的 "-L <core> <rom>"
                                       翻译为厂商的 RA_launch.sh <core> <rom>,
                                       并重建 32 位库环境
@@ -82,7 +89,7 @@ rm -rf /mnt/data/es-de-home /mnt/data/mali-lib /mnt/data/retroarch-wrapper.sh
 
 1. **ES-DE 界面无声音**(`SDL_AUDIODRIVER=dummy`):本机 ALSA 设备独占、音量控制被厂商 asound.conf 的 hooks 锁死,启用音频会导致游戏无声。游戏内声音不受影响。完整调研见 `AUDIO_RESEARCH.md`
 2. **四个原机平台不显示**:`HBMAME`(自制 MAME)、`PGM2`、`VARCADE`(竖版街机)、`ONS`(ONScripter 视觉小说)在 ES-DE 中没有对应系统,这些游戏仍可在原机启动器游玩
-3. **盖屏待机未实现**:官方启动器的翻盖关屏/超级待机逻辑内置在 muos1.bin 中,ES-DE 不自带。未来计划以 lid 守护脚本补上(超级待机实测机制已摸清,见项目文档 `OFFICIAL_LAUNCHER.md`)
+3. **"正常待机"(只关屏不睡眠)未实现**:合盖一律整机挂起(超级待机),与原机一致;只关屏的轻量模式不支持
 4. USB 手柄:标准 SDL 手柄自动支持;内置手柄映射文件针对 `ANBERNIC-keys`(GUID `19002cb4...`),不同固件版本若识别名不同,需重新配置键位
 
 ## 进阶:启动加速(可选)

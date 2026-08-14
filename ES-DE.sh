@@ -17,5 +17,14 @@ progdir="$(cd "$(dirname "$0")" && pwd)"
 export LD_LIBRARY_PATH=/mnt/data/mali-lib
 export SDL_AUDIODRIVER=dummy
 export HOME=/
+
+# lid 守护(超级待机:合盖挂起,电源键唤醒;游戏中自动让位给厂商守护)
+LID_DAEMON="/mnt/data/lid-daemon.sh"
+if [ -x "$LID_DAEMON" ]; then
+    "$LID_DAEMON" &
+    LID_PID=$!
+    trap 'kill "$LID_PID" 2>/dev/null' EXIT
+fi
+
 cd "${progdir}/esde"
 "${progdir}/esde/es-de" --home /mnt/data/es-de-home > "${progdir}/esde/log.txt" 2>&1

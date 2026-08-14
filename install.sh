@@ -48,16 +48,21 @@ mkdir -p "$APPS_DIR/esde"
 cp -rf "$REPO_DIR/esde/resources" "$APPS_DIR/esde/"
 cp -f  "$REPO_DIR/esde/es-de"     "$APPS_DIR/esde/es-de"
 cp -f  "$REPO_DIR/ES-DE.sh"       "$APPS_DIR/ES-DE.sh"
-chmod +x "$APPS_DIR/ES-DE.sh" "$APPS_DIR/esde/es-de"
+cp -f  "$REPO_DIR/lid-daemon.sh"  "/mnt/data/lid-daemon.sh"
+chmod +x "$APPS_DIR/ES-DE.sh" "$APPS_DIR/esde/es-de" "/mnt/data/lid-daemon.sh"
 echo "  ✓ 程序安装完成"
 
 # ── 4. 用户目录模板 ─────────────────────────────────────
 echo "[4/5] 用户目录模板..."
 if [ "$MODE" = "upgrade" ]; then
-    # 升级模式:模板文件带 .bak 备份后更新(保证测试环境 = 发行内容)
+    # 升级模式:
+    #   - es_input.xml / 手柄映射 / 事件脚本:发行管理的文件,带 .bak 备份后更新
+    #   - es_settings.xml:只注入发行必需键(CustomEventScripts),绝不整体覆盖
+    #     (否则会抹掉用户的主题/语言/刮削等设置)
     mkdir -p "$HOME_DIR"
-    for f in settings/es_settings.xml settings/es_input.xml \
-             controllers/es_controller_mappings.cfg; do
+    for f in settings/es_input.xml \
+             controllers/es_controller_mappings.cfg \
+             scripts/game-start/game-flag.sh scripts/game-end/game-flag.sh; do
         src="$REPO_DIR/home-template/ES-DE/$f"
         dst="$HOME_DIR/ES-DE/$f"
         [ -f "$src" ] || continue
@@ -68,7 +73,17 @@ if [ "$MODE" = "upgrade" ]; then
         fi
         cp -f "$src" "$dst"
     done
-    echo "  ✓ 模板配置已同步(差异文件留有 .bak 备份)"
+    SETTINGS="$HOME_DIR/ES-DE/settings/es_settings.xml"
+    if [ -f "$SETTINGS" ] && grep -q 'name="CustomEventScripts" value="false"' "$SETTINGS"; then
+        cp -f "$SETTINGS" "$SETTINGS.bak"
+        sed -i 's/name="CustomEventScripts" value="false"/name="CustomEventScripts" value="true"/' "$SETTINGS"
+        echo "  · es_settings.xml: CustomEventScripts → true(旧文件 → .bak)"
+    elif [ -f "$SETTINGS" ] && ! grep -q 'name="CustomEventScripts"' "$SETTINGS"; then
+        cp -f "$SETTINGS" "$SETTINGS.bak"
+        echo '<bool name="CustomEventScripts" value="true" />' >> "$SETTINGS"
+        echo "  · es_settings.xml 注入 CustomEventScripts=true(旧文件 → .bak)"
+    fi
+    echo "  ✓ 模板配置已同步"
 else
     if [ -d "$HOME_DIR/ES-DE" ]; then
         echo "  ! 已存在 $HOME_DIR/ES-DE,保留现有配置(全新安装请先删除;日常升级请用: sh install.sh upgrade)"
