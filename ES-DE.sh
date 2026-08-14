@@ -8,6 +8,9 @@
 #   fontconfig 修复:ES-DE 的 libpangoft2 需要 FcWeightFromOpenTypeDouble(仅
 #   1.12.0 有),而厂商 RA_launch.sh 启动 32 位 RetroArch 前会换成 1.10.1
 #   → 每次启动 ES-DE 前必须翻回 1.12.0,否则 es-de 秒退(symbol lookup error)
+#   SDL_AUDIODRIVER=dummy:静音运行(音频调研结论见 AUDIO_RESEARCH.md:
+#   ES-DE 若用 ALSA 会独占声卡导致游戏无声;音量键被厂商 hook 锁死,
+#   两害相权,保持 dummy —— 游戏内声音不受影响)
 progdir="$(cd "$(dirname "$0")" && pwd)"
 (ls -l /lib/aarch64-linux-gnu/libfontconfig.so.1 2>/dev/null | grep -q '1.10.1') && \
   ln -sf /lib/aarch64-linux-gnu/libfontconfig.so.1.12.0 /lib/aarch64-linux-gnu/libfontconfig.so.1

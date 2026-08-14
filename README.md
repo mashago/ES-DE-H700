@@ -47,7 +47,9 @@ Copy this repo to any directory on the handheld (suggested: under `/mnt/mmc/`), 
 
 ```bash
 cd ES-DE-H700
-sh install.sh
+sh install.sh            # fresh install
+sh install.sh upgrade    # upgrade: sync program/resources/scripts + update template
+                         # configs (existing configs are backed up to .bak first)
 ```
 
 After installation, "ES-DE" appears in the **APPS** category of dmenu. Just launch it.
@@ -79,9 +81,19 @@ Installation steps:
 
 ## Known limitations
 
-1. **No UI sounds** (`SDL_AUDIODRIVER=dummy`): ES-DE 3.x needs PulseAudio/PipeWire, which this system doesn't ship. In-game sound is unaffected.
-2. **Lid-close standby not implemented**: the stock launcher's lid-close screen-off / super standby logic is built into muos1.bin itself. A lid daemon is planned for the future (the super-standby mechanism has been fully reverse-engineered and documented in the project notes).
-3. USB gamepads: standard SDL controllers are auto-supported. The built-in pad mapping targets `ANBERNIC-keys` (GUID `19002cb4...`); if a different firmware version exposes a different device name, the key mapping needs reconfiguration.
+1. **No UI sounds** (`SDL_AUDIODRIVER=dummy`): the stock ALSA device is exclusive and its volume control is locked by the vendor's asound.conf hooks, so enabling audio would break in-game sound. In-game sound is unaffected. Full research: `AUDIO_RESEARCH.md`.
+2. **Four stock platforms not shown**: `HBMAME` (homebrew MAME), `PGM2`, `VARCADE` (vertical arcade) and `ONS` (ONScripter visual novels) have no equivalent systems in ES-DE; their games remain playable via the stock launcher.
+3. **Lid-close standby not implemented**: the stock launcher's lid-close screen-off / super standby logic is built into muos1.bin itself. A lid daemon is planned for the future (the super-standby mechanism has been fully reverse-engineered and documented in the project notes).
+4. USB gamepads: standard SDL controllers are auto-supported. The built-in pad mapping targets `ANBERNIC-keys` (GUID `19002cb4...`); if a different firmware version exposes a different device name, the key mapping needs reconfiguration.
+
+## Advanced: faster startup (optional)
+
+By default ES-DE scans all ROM folders on every launch (~25-30s with large collections), so newly copied ROMs always show up automatically. If you prefer faster startup and accept a manual step, there is an opt-in tool:
+
+```bash
+python3 generate-gamelists.py                       # pre-generate all gamelists (merge-safe)
+# then enable "Only Parse Gamelist.xml Files" in ES-DE: Main Menu → Settings → Other Settings
+# After this, startup drops to ~10s. New ROMs require re-running the script above.
 
 ## Troubleshooting
 

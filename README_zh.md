@@ -47,7 +47,8 @@ ES-DE-H700/
 
 ```bash
 cd ES-DE-H700
-sh install.sh
+sh install.sh            # 全新安装
+sh install.sh upgrade    # 升级:同步程序/资源/脚本 + 模板配置更新(原配置先备份为 .bak)
 ```
 
 安装完成后,dmenu 的 **APPS** 分类里出现「ES-DE」,直接启动。
@@ -79,9 +80,20 @@ rm -rf /mnt/data/es-de-home /mnt/data/mali-lib /mnt/data/retroarch-wrapper.sh
 
 ## 已知限制
 
-1. **ES-DE 界面无声音**(`SDL_AUDIODRIVER=dummy`):ES-DE 3.x 需 PulseAudio/PipeWire,本机未装。游戏内声音不受影响
-2. **盖屏待机未实现**:官方启动器的翻盖关屏/超级待机逻辑内置在 muos1.bin 中,ES-DE 不自带。未来计划以 lid 守护脚本补上(超级待机实测机制已摸清,见项目文档 `OFFICIAL_LAUNCHER.md`)
-3. USB 手柄:标准 SDL 手柄自动支持;内置手柄映射文件针对 `ANBERNIC-keys`(GUID `19002cb4...`),不同固件版本若识别名不同,需重新配置键位
+1. **ES-DE 界面无声音**(`SDL_AUDIODRIVER=dummy`):本机 ALSA 设备独占、音量控制被厂商 asound.conf 的 hooks 锁死,启用音频会导致游戏无声。游戏内声音不受影响。完整调研见 `AUDIO_RESEARCH.md`
+2. **四个原机平台不显示**:`HBMAME`(自制 MAME)、`PGM2`、`VARCADE`(竖版街机)、`ONS`(ONScripter 视觉小说)在 ES-DE 中没有对应系统,这些游戏仍可在原机启动器游玩
+3. **盖屏待机未实现**:官方启动器的翻盖关屏/超级待机逻辑内置在 muos1.bin 中,ES-DE 不自带。未来计划以 lid 守护脚本补上(超级待机实测机制已摸清,见项目文档 `OFFICIAL_LAUNCHER.md`)
+4. USB 手柄:标准 SDL 手柄自动支持;内置手柄映射文件针对 `ANBERNIC-keys`(GUID `19002cb4...`),不同固件版本若识别名不同,需重新配置键位
+
+## 进阶:启动加速(可选)
+
+默认情况下 ES-DE 每次启动会扫描全部 ROM 目录(大合集约 25-30 秒),好处是新拷入的 ROM 自动出现。如果你更在意启动速度、且能接受一个手动步骤,仓库提供了可选工具:
+
+```bash
+python3 generate-gamelists.py      # 批量预生成全部 gamelist(合并模式,可安全重复跑)
+# 然后在 ES-DE 里开启「仅解析 gamelist.xml」:主菜单 → 设置 → 其他设置
+# 之后启动降到约 10 秒;新增 ROM 需要重跑上面的脚本
+```
 
 ## 故障排查
 
