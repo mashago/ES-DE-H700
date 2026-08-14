@@ -24,6 +24,8 @@ ES-DE-H700/
 ├── BUILD.md / BUILD_zh.md          ← how the es-de binary was built (EN / 中文)
 ├── LICENSE                         ← ES-DE license (MIT)
 ├── install.sh                      ← one-click installer (dependency check → symlinks → deploy)
+├── uninstall.sh                    ← removes installed files (--purge also deletes user data)
+├── install.conf                    ← optional path overrides (APPS/ROM/DATA dirs)
 ├── esde/
 │   ├── es-de                       ← ES-DE 3.4.1 binary (OpenGL ES build, Mali-G31)
 │   └── resources/                  ← runtime data: system definitions (es_systems.xml /
@@ -61,11 +63,25 @@ sh install.sh upgrade    # upgrade: sync program/resources/scripts + update temp
 
 After installation, "ES-DE" appears in the **APPS** category of dmenu. Just launch it.
 
+### Custom installation paths
+
+If your directories differ from the standard Anbernic layout, edit `install.conf` before installing:
+
+```bash
+APPS_DIR="/mnt/mmc/Roms/APPS"   # dmenu applications directory
+ROM_DIR="/mnt/mmc/Roms"         # ROM root (written into ES-DE's ROMDirectory)
+DATA_DIR="/mnt/data"            # user data / runtime libraries
+```
+
+The installer reads this file automatically (defaults are used if it's missing) and patches the deployed `ES-DE.sh`, `es_settings.xml` and `es_find_rules.xml` accordingly. Changing the file later requires re-running `sh install.sh upgrade`.
+
 ### Uninstall
 
 ```bash
-rm -rf /mnt/mmc/Roms/APPS/esde /mnt/mmc/Roms/APPS/ES-DE.sh
-rm -rf /mnt/data/es-de-home /mnt/data/mali-lib /mnt/data/retroarch-wrapper.sh
+sh uninstall.sh            # remove program files, keep user data (themes/settings/
+                           # scraped media — game saves live in RetroArch's own
+                           # config directory, unaffected by uninstall)
+sh uninstall.sh --purge    # also delete the user data directory (es-de-home)
 ```
 
 ## Usage notes

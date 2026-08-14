@@ -24,6 +24,8 @@ ES-DE-H700/
 ├── BUILD.md / BUILD_zh.md          ← es-de 二进制的构建方法(英文 / 中文)
 ├── LICENSE                         ← ES-DE 许可证(MIT)
 ├── install.sh                      ← 一键安装脚本(依赖检查 → 软链 → 部署)
+├── uninstall.sh                    ← 卸载脚本(--purge 连用户数据一起删)
+├── install.conf                    ← 可选路径配置(APPS/ROM/DATA 目录)
 ├── esde/
 │   ├── es-de                       ← ES-DE 3.4.1 二进制(OpenGL ES 构建,Mali-G31)
 │   └── resources/                  ← 运行时数据:系统定义(es_systems.xml /
@@ -60,11 +62,24 @@ sh install.sh upgrade    # 升级:同步程序/资源/脚本 + 模板配置更�
 
 安装完成后,dmenu 的 **APPS** 分类里出现「ES-DE」,直接启动。
 
+### 自定义安装路径
+
+如果你的目录布局与标准 Anbernic 布局不同,安装前编辑 `install.conf`:
+
+```bash
+APPS_DIR="/mnt/mmc/Roms/APPS"   # dmenu 应用目录
+ROM_DIR="/mnt/mmc/Roms"         # ROM 根目录(写入 ES-DE 的 ROMDirectory)
+DATA_DIR="/mnt/data"            # 用户数据/运行库目录
+```
+
+安装器会自动读取该文件(不存在则用默认值),并按配置修正部署的 `ES-DE.sh`、`es_settings.xml` 和 `es_find_rules.xml`。之后修改配置需重新运行 `sh install.sh upgrade` 生效。
+
 ### 卸载
 
 ```bash
-rm -rf /mnt/mmc/Roms/APPS/esde /mnt/mmc/Roms/APPS/ES-DE.sh
-rm -rf /mnt/data/es-de-home /mnt/data/mali-lib /mnt/data/retroarch-wrapper.sh
+sh uninstall.sh            # 移除程序文件,保留用户数据(主题/设置/刮削媒体;
+                           # 游戏存档在 RetroArch 自己的配置目录,不受卸载影响)
+sh uninstall.sh --purge    # 连同用户数据目录(es-de-home)一起删除
 ```
 
 ## 使用提示

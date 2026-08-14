@@ -13,12 +13,20 @@ if [ "$MODE" != "install" ] && [ "$MODE" != "upgrade" ]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-APPS_DIR="/mnt/mmc/Roms/APPS"
-LIB_DIR="/mnt/data/mali-lib"
-HOME_DIR="/mnt/data/es-de-home"
-WRAPPER="/mnt/data/retroarch-wrapper.sh"
+
+# 路径配置:优先读 install.conf(用户可编辑),缺省用标准布局
+CONF="$REPO_DIR/install.conf"
+[ -f "$CONF" ] && . "$CONF"
+APPS_DIR="${APPS_DIR:-/mnt/mmc/Roms/APPS}"
+ROM_DIR="${ROM_DIR:-/mnt/mmc/Roms}"
+DATA_DIR="${DATA_DIR:-/mnt/data}"
+LIB_DIR="$DATA_DIR/mali-lib"
+HOME_DIR="$DATA_DIR/es-de-home"
+WRAPPER="$DATA_DIR/retroarch-wrapper.sh"
+STANDBY="$DATA_DIR/standby-daemon.py"
 
 echo "== ES-DE H700 安装器($MODE 模式)=="
+echo "路径: APPS=$APPS_DIR ROM=$ROM_DIR DATA=$DATA_DIR"
 
 # ── 1. 前置检查 ─────────────────────────────────────────
 echo "[1/5] 检查厂商依赖..."
@@ -48,11 +56,17 @@ mkdir -p "$APPS_DIR/esde"
 cp -rf "$REPO_DIR/esde/resources" "$APPS_DIR/esde/"
 cp -f  "$REPO_DIR/esde/es-de"     "$APPS_DIR/esde/es-de"
 cp -f  "$REPO_DIR/ES-DE.sh"       "$APPS_DIR/ES-DE.sh"
-cp -f  "$REPO_DIR/standby-daemon.py" "/mnt/data/standby-daemon.py"
-chmod +x "$APPS_DIR/ES-DE.sh" "$APPS_DIR/esde/es-de" "/mnt/data/standby-daemon.py"
-rm -f "/mnt/data/lid-daemon.sh"   # 旧版清理(合盖+电源键已并入 standby-daemon.py)
+cp -f  "$REPO_DIR/standby-daemon.py" "$STANDBY"
+chmod +x "$APPS_DIR/ES-DE.sh" "$APPS_DIR/esde/es-de" "$STANDBY"
+rm -f "$DATA_DIR/lid-daemon.sh"   # 旧版清理(合盖+电源键已并入 standby-daemon.py)
 mkdir -p "$APPS_DIR/Imgs"
 cp -f  "$REPO_DIR/ES-DE.png"    "$APPS_DIR/Imgs/ES-DE.png"
+# 按配置修正硬编码路径(默认值下跳过)
+if [ "$DATA_DIR" != "/mnt/data" ]; then
+    sed -i "s|/mnt/data|$DATA_DIR|g" "$APPS_DIR/ES-DE.sh"
+    sed -i "s|/mnt/data/retroarch-wrapper.sh|$WRAPPER|g" \
+        "$APPS_DIR/esde/resources/systems/linuxarm/es_find_rules.xml"
+fi
 echo "  ✓ 程序安装完成"
 
 # ── 4. 用户目录模板 ─────────────────────────────────────
@@ -93,7 +107,9 @@ else
     else
         mkdir -p "$HOME_DIR"
         cp -r "$REPO_DIR/home-template/ES-DE" "$HOME_DIR/"
-        echo "  ✓ 已创建 $HOME_DIR/ES-DE"
+        # 模板里的 ROMDirectory 按 ROM_DIR 修正(默认值下替换后等同原值)
+        sed -i "s|/mnt/mmc/Roms/|$ROM_DIR/|g" "$HOME_DIR/ES-DE/settings/es_settings.xml"
+        echo "  ✓ 已创建 $HOME_DIR/ES-DE(ROM 目录: $ROM_DIR)"
     fi
 fi
 
